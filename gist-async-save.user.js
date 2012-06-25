@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name    Gist asynchronous save mode
 // @match   https://gist.github.com/*
-// @version 1.0
+// @version 1.1
 // ==/UserScript==
 
 if (window.location.href.match(/\/edit$/)) {
@@ -38,6 +38,53 @@ if (window.location.href.match(/\/edit$/)) {
       var spinner = jQuery('<img style="float: left; margin-left: 4px; padding-top: 2px;" />');
       spinner.attr('src', 'https://assets.github.com/images/spinners/octocat-spinner-32.gif');
       saveAndStayButton.find('span').before(spinner);
+
+      // Add the preview box
+      var previewBox = jQuery('<div class="preview" style="position:fixed;width:68%;top:75px;right:-65%;border: 1px solid #D9D9D9;background-color:white;"></div>');
+      previewBox.resize = function() {
+        previewBox.css('height', jQuery(window).height() - 150);
+      }
+
+      // Preview toggler
+      previewBox.collapsed = true;
+      previewBox.toggle = function() {
+        if (previewBox.collapsed) {
+          previewBox.animate({right: '0%'}, 300);
+        } else {
+          previewBox.animate({right: '-65%%'}, 300);
+        }
+        previewBox.collapsed = !previewBox.collapsed;
+      }
+
+      // Actual preview content
+      previewBox.contentBox = jQuery('<div class="content" style="width:92%;height:100%;float:right;margin-right:3%;overflow:scroll;"></div>');
+      // Area to hide/show the preview area
+      previewBox.handle = jQuery('<div class="handle" style="width:5%;height:100%;float:left;background-color:#E9E9E9;color:#666;"><div style="position:absolute;top:47%;-webkit-transform: rotate(-90deg);-moz-transform: rotate(-90deg);-ms-transform: rotate(-90deg);-o-transform: rotate(-90deg);"><a href="#">Preview</a></div></div>');
+
+      // Update the gist's preview
+      previewBox.update = function() {
+        var gistId = window.location.href.match(/\/([a-fA-F0-9]+)\/edit$/)[1];
+        $.get('https://gist.github.com/' + gistId, function(data) {
+          previewBox.contentBox.html($(data).find('#files').html());
+        });
+      }
+
+      // Initialize preview box
+      jQuery(window).resize(previewBox.resize);
+      previewBox.append(previewBox.handle).append(previewBox.contentBox);
+      previewBox.find('.handle, .handle a').click(function(e) {
+        e.preventDefault();
+        previewBox.toggle();
+      });
+      jQuery('body').append(previewBox);
+      previewBox.resize();
+      previewBox.update();
+
+      // Hooks up the keyboard shortcuts to the preview box
+      key('⌘+r, ctrl+r', function(e, handler){
+        e.preventDefault();
+        previewBox.toggle();
+      });
 
       // Turn the new save button on/off
       var enableSaveAndStayButton = function() {
@@ -90,6 +137,7 @@ if (window.location.href.match(/\/edit$/)) {
           success(function(data) {
             highlightEditors({color: '#4183C4', duration: 200});
             enableSaveAndStayButton();
+            previewBox.update();
           }).
           error(function (jqXHR, status) {
             saveAndStayButton.find('img').hide();
