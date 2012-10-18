@@ -12,7 +12,7 @@ I took a lot of notes in a Gist and wanted to save it every now and then which i
 
 ### The Clicky Clicky Way
 
-* Click [here](https://github.com/walski/gist-async-save/raw/master/gist-async-save.user.js) 
+* Click [here](https://github.com/walski/gist-async-save/raw/master/gist-async-save.user.js)
 * Click on ``Continue`` at the bottom of your browser
 * Confirm that the script is allowed to access data from any page you surf at https://gist.github.com/ by clicking ``Add``
 
@@ -28,7 +28,7 @@ I took a lot of notes in a Gist and wanted to save it every now and then which i
 The scripts adds another save button and a preview window (on the right side of the browser window) to each Gist's edit page. You can also save and toggle the preview with the keyboard shortcuts:
 
 * **⌘ + s** or **Ctrl + s**: Save Gist
-* **⌘ + r** or **Ctrl + r**: Toggle preview window
+* **⌘ + e** or **Ctrl + e**: Toggle preview window
 
 ## Thanks!
 
